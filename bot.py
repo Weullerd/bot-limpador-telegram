@@ -8,7 +8,7 @@ from telegram.ext import (
     filters
 )
 
-BOT_TOKEN = os.getenv("BOT_TOKEN") or "8462336015:AAHWg_thwvm6n3A2StpJ8iqUIM669NFeFGA"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 TEMPO_APAGAR = 30  # segundos
 
 async def apagar_bots(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -27,4 +27,5 @@ app = ApplicationBuilder().token(BOT_TOKEN).build()
 app.add_handler(MessageHandler(filters.ChatType.CHANNEL, apagar_bots))
 
 print("🤖 Bot limpador rodando...")
+
 app.run_polling()
