@@ -11,21 +11,31 @@ from telegram.ext import (
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 TEMPO_APAGAR = 30  # segundos
 
-async def apagar_bots(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = update.message
+async def apagar_posts(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    msg = update.channel_post
     if not msg:
         return
 
-    # Apaga SOMENTE mensagens enviadas por bots
-    if msg.from_user and msg.from_user.is_bot:
-        await asyncio.sleep(TEMPO_APAGAR)
-        await msg.delete()
+    # log opcional pra debug
+    print(f"Post recebido no canal: {msg.message_id}")
+
+    await asyncio.sleep(TEMPO_APAGAR)
+
+    try:
+        await context.bot.delete_message(
+            chat_id=msg.chat_id,
+            message_id=msg.message_id
+        )
+        print(f"Post {msg.message_id} apagado")
+    except Exception as e:
+        print(f"Erro ao apagar post {msg.message_id}: {e}")
 
 app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-# Isso aqui substitui o ChannelPostHandler
-app.add_handler(MessageHandler(filters.ChatType.CHANNEL, apagar_bots))
+# Handler correto para posts em CANAIS
+app.add_handler(
+    MessageHandler(filters.ChatType.CHANNEL, apagar_posts)
+)
 
 print("🤖 Bot limpador rodando...")
-
 app.run_polling()
